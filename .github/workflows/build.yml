@@ -1,31 +1,44 @@
-name: Build sys-tune and overlay
+--
+name: ci
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    container: devkitpro/devkita64:latest
+    container: devkitpro/devkita64
 
     steps:
-    - name: Checkout
+    - name: Checkout project
       uses: actions/checkout@master
       with:
         submodules: recursive
 
-    - name: Build
+    - name: Build project
       run: |
-        make -j$(nproc)
-        mkdir -p dist/switch/.overlays
-        mkdir -p dist/atmosphere/contents/4200000000000000/flags
-        touch dist/atmosphere/contents/4200000000000000/flags/boot2.flag
-        cp sys-tune/sys-tune.nsp dist/atmosphere/contents/4200000000000000/exefs.nsp
-        cp sys-tune/toolbox.json dist/atmosphere/contents/4200000000000000/
-        cp overlay/sys-tune-overlay.ovl dist/switch/.overlays/
-
-    - name: Deploy
-      if: ${{ github.event_name != 'pull_request' && github.event.action != 'unassigned' }}
-      uses: actions/upload-artifact@master
+          git config --global --add safe.directory '*' && \
+          git submodule update --init libs/libnx && \
+          make -C libs/libnx/nx install -j$(nproc) && \
+          make dist -j2
+          cd dist
+          zip -r ../sys-tune.zip *
+          
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
       with:
-        name: sys-tune
-        path: dist
+        path: sys-tune.zip
+        
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.release_token }}
+        file: sys-tune.zip
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+        make_latest: true 
+        release_name: ${{ github.event.repository.updated_at }}

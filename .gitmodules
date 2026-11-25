@@ -1,3 +1,6 @@
 [submodule "overlay/lib"]
 	path = overlay/lib
-	url = git@github.com:WerWolv/libtesla.git
+	url = http://github.com/zerofo/libtesla.git
+[submodule "libs/libnx"]
+	path = libs/libnx
+	url = https://github.com/switchbrew/libnx
