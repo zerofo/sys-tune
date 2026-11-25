@@ -23,6 +23,7 @@ jobs:
           git submodule update --init libs/libnx && \
           make -C libs/libnx/nx install -j$(nproc) && \
           make dist -j2
+          rm -rf *.zip
           cd dist
           zip -r ../sys-tune.zip *
           
