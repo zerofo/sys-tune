@@ -20,7 +20,7 @@ jobs:
     - name: Build project
       run: |
           git config --global --add safe.directory '*' && \
-          git submodule update --init libs/libnx && \
+          git submodule update --init --remote libs/libnx && \
           make -C libs/libnx/nx install -j$(nproc) && \
           make dist -j2
           rm -rf *.zip
