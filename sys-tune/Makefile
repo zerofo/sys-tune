@@ -60,7 +60,7 @@ endif
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
+ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft
 
 CFLAGS	:=	-flto=auto -g -Wall -O2 -ffunction-sections \
 			$(ARCH) $(DEFINES)
@@ -172,6 +172,12 @@ endif
 .PHONY: $(BUILD) clean all
 
 #---------------------------------------------------------------------------------
+
+# vgedit-style fix: repair PIE link breakage under devkitA64 gcc 15 (idempotent)
+all: | fix_pie
+.PHONY: fix_pie
+fix_pie:
+	python3 $(CURDIR)/fix_pie.py
 all: $(BUILD)
 
 $(BUILD):
